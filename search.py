@@ -126,10 +126,11 @@ def depthFirstSearch(problem):
         while(final_state in parents_graph.keys()):
             # traveling through last way u reached each parents and pushing into solution
             final_state_prev = parents_graph[final_state]
-            acoes.insert(0, vertices_descobertos[final_state])
+            acoes.append(vertices_descobertos[final_state])
             final_state = final_state_prev
     except NameError:
         print "Caminho nao encontrado."
+    acoes.reverse()
     return acoes
 
 
@@ -207,16 +208,15 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # node[2] = Cost
         node = frontier.pop()
         if node[0] not in explored:
-            explored.append(node[0])
             if problem.isGoalState(node[0]):
                 return node[1]
-
+            explored.append(node[0])
             for neighbor in problem.getSuccessors(node[0]):
-                priority = (node[2] + neighbor[2]) + \
-                    heuristic(neighbor[0], problem)
+                priority = (node[2] + neighbor[2])
+                cost = priority + heuristic(neighbor[0], problem)
                 actions_to_neighbor = node[1] + [neighbor[1]]
                 frontier.push(
-                    (neighbor[0], actions_to_neighbor, priority), priority)
+                    (neighbor[0], actions_to_neighbor, priority), cost)
 
 
 # Abbreviations

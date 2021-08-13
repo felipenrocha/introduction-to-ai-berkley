@@ -313,6 +313,7 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
+        # i needed insight to what exactly i was looking for in a gamestate
         # Hint: The only parts of the game state you need to reference in your implementation are the starting Pacman position and the location of the four corners.
 
         # state[0]: starting position, state[1] = corners reached
@@ -324,10 +325,12 @@ class CornersProblem(search.SearchProblem):
         """
         isGoal = False
         goals_reached = list(state[1])
-        if state[0] not in goals_reached:
+        if state[0] not in goals_reached and state[0] in self.corners:
+            # push state if its not in goals reached yet  
             goals_reached.append(state[0])
         goals_reached.sort()
         self.corners.sort()
+        # compare corners with goals reached:
         isGoal = goals_reached == self.corners
 
         return isGoal
