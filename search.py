@@ -109,25 +109,19 @@ def depthFirstSearch(problem):
     inicio = problem.getStartState()
     # discovered:
     vertices_descobertos = {}
+    # graph storing directions to go to its parents
     parents_graph = {}
     # action solutions
     acoes = []
-    # bool value to check if goal is reached
-    goal = False
-    #  let S be a stack
     pilha_s = util.Stack()
 
     pilha_s.push((inicio, 'inicio'))
     # DFS ITERATIVE:
     #     while S is not empty do
-    while not pilha_s.isEmpty() and goal == False:
-        #  v = S.pop()
+    while not pilha_s.isEmpty():
         v = pilha_s.pop()
-
         vertices_descobertos[v[0]] = v[1]
-
         if problem.isGoalState(v[0]):
-            goal = True
             final_state = v[0]
             break
         for vertice_adjacente in problem.getSuccessors(v[0]):
@@ -135,17 +129,31 @@ def depthFirstSearch(problem):
                 parents_graph[vertice_adjacente[0]] = v[0]
                 pilha_s.push(vertice_adjacente)
 
-    # montando a lista de acoes:
-    while(final_state in parents_graph.keys()):
-        final_state_prev = parents_graph[final_state]
-        acoes.insert(0, vertices_descobertos[final_state])
-        final_state = final_state_prev
+   # montando a lista de acoes:
+    try:
+        while(final_state in parents_graph.keys()):
+            # traveling through last way u reached each parents and pushing into solution
+            final_state_prev = parents_graph[final_state]
+            acoes.insert(0, vertices_descobertos[final_state])
+            final_state = final_state_prev
+    except NameError:
+        print "Caminho nao encontrado."
     return acoes
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+
+
+    inicio = problem.getStartState()
+    vertices_descobertos = {}
+    # graph storing directions to go to its parents
+    parents_graph = {}
+    acoes = []
+    goal = False
+    fila = util.Queue()
+    fila.push((inicio, 'inicio'))
 #     # BASED ON https://www.youtube.com/watch?v=MMCUepjSoLQ&list=LL&index=2&t=2s adapted to:
 #        escolha uma raiz s de G
 #    marque s
@@ -163,31 +171,18 @@ def breadthFirstSearch(problem):
 #       fim para
 #       retira v de F
 #    fim enquanto
-
-    inicio = problem.getStartState()
-    vertices_descobertos = {}
-    parents_graph = {}
-    acoes = []
-    goal = False
-    fila = util.Queue()
-
-    fila.push((inicio, 'inicio'))
-    # DFS ITERATIVE:
-    #     while S is not empty do
-    while not fila.isEmpty() and goal == False:
+    while not fila.isEmpty():
         v = fila.pop()
-        if problem.isGoalState(v[0]):
-            goal = True
-            final_state = v[0]
-            vertices_descobertos[v[0]] = v[1]
-            break
         vertices_descobertos[v[0]] = v[1]
 
+        if problem.isGoalState(v[0]):
+            final_state = v[0]
+            break
+
         for vertice_adjacente in problem.getSuccessors(v[0]):
-            if vertice_adjacente[0] not in vertices_descobertos.keys():
+            if vertice_adjacente[0] not in vertices_descobertos.keys() and vertice_adjacente[0] not in parents_graph.keys():
                 parents_graph[vertice_adjacente[0]] = v[0]
                 fila.push(vertice_adjacente)
-
 
     # montando a lista de acoes:
     try:
@@ -202,8 +197,29 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    "https://www.educative.io/edpresso/what-is-uniform-cost-search*** and https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Practical_optimizations_and_infinite_graphs"
+
+    # priority = cost + parent cost
+    start = problem.getStartState()
+    frontier = util.PriorityQueue()
+    # using actions inside queue  (each node stores the actions to take to him, so when the goal is reached, you return this value)
+    actions = []
+    frontier.push([start, actions, 0], 0)
+    explored = []
+
+    while not frontier.isEmpty():
+        # node[0] = State/Name
+        # node[1] = Action
+        # node[2] = Cost
+        node = frontier.pop()
+        if node[0] not in explored:
+            explored.append(node[0])
+            if problem.isGoalState(node[0]):
+                return node[1]
+            for neighbor in problem.getSuccessors(node[0]):
+                priority = node[2] + neighbor[2]
+                actions_next = node[1] + [neighbor[1]]
+                frontier.push((neighbor[0], actions_next, priority), priority)
 
 
 def nullHeuristic(state, problem=None):
