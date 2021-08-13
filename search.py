@@ -120,6 +120,8 @@ def depthFirstSearch(problem):
     #     while S is not empty do
     while not pilha_s.isEmpty():
         v = pilha_s.pop()
+        # v[0] : current node
+        # v[1] : action
         vertices_descobertos[v[0]] = v[1]
         if problem.isGoalState(v[0]):
             final_state = v[0]
@@ -245,7 +247,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     while not frontier.isEmpty():
         # node[0] = State/Name
-        # node[1] = Actions from Start to Node
+        # node[1] = List of Actions from Start to Node ['South', 'West', .... ]
         # node[2] = Cost
         node = frontier.pop()
         if node[0] not in explored:
