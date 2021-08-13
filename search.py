@@ -80,21 +80,11 @@ def depthFirstSearch(problem):
 
     Your search algorithm needs to return a list of actions that reaches the
     goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
+#     # BASED ON https://www.youtube.com/watch?v=MMCUepjSoLQ&list=LL&index=2&t=2s adapted to:
 
     # DFS :
-    # print "Start:", problem.getStartState()
-    # print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    #     # print "Start's successors:", problem.getSuccessors(problem.getStartState())
-
-    # BASED ON: https://en.wikipedia.org/wiki/Depth-first_search#Pseudocode
+    # https://en.wikipedia.org/wiki/Depth-first_search#Pseudocode
     # procedure DFS_iterative(G, v) is
     #     let S be a stack
     #     S.push(v)
@@ -145,8 +135,6 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-#     # BASED ON https://www.youtube.com/watch?v=MMCUepjSoLQ&list=LL&index=2&t=2s adapted to:
-
 
     inicio = problem.getStartState()
     vertices_descobertos = []
@@ -158,9 +146,9 @@ def breadthFirstSearch(problem):
         # node[0]: state/name
         # node[1]: actions to take to node[0]
         if node[0] not in vertices_descobertos:
-            vertices_descobertos.append(node[0])
             if problem.isGoalState(node[0]):
                 return node[1]
+            vertices_descobertos.append(node[0])
             for vertice_adjacente in problem.getSuccessors(node[0]):
                 actions_to_vertice_adjacente = node[1] + [vertice_adjacente[1]]
                 fila.push([vertice_adjacente[0], actions_to_vertice_adjacente])
