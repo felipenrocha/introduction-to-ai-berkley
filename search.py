@@ -109,7 +109,7 @@ def depthFirstSearch(problem):
     inicio = problem.getStartState()
     # discovered:
     vertices_descobertos = {}
-    # graph storing directions to go to its parents
+    # graph storing directions to go to start
     parents_graph = {}
     # action solutions
     acoes = []
@@ -145,10 +145,9 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
-
     inicio = problem.getStartState()
     vertices_descobertos = {}
-    # graph storing directions to go to its parents
+    # graph storing directions to go to start
     parents_graph = {}
     acoes = []
     goal = False
@@ -202,7 +201,7 @@ def uniformCostSearch(problem):
     # priority = cost + parent cost
     start = problem.getStartState()
     frontier = util.PriorityQueue()
-    # using actions inside queue  (each node stores the actions to take to him, so when the goal is reached, you return this value)
+    # using actions inside queue instead of parents_graph to backtrack goal. Each node stores the actions to take to him, so when the goal is reached, you return this value)
     actions = []
     frontier.push([start, actions, 0], 0)
     explored = []
@@ -218,8 +217,9 @@ def uniformCostSearch(problem):
                 return node[1]
             for neighbor in problem.getSuccessors(node[0]):
                 priority = node[2] + neighbor[2]
-                actions_next = node[1] + [neighbor[1]]
-                frontier.push((neighbor[0], actions_next, priority), priority)
+                actions_to_neighbor = node[1] + [neighbor[1]]
+                frontier.push(
+                    (neighbor[0], actions_to_neighbor, priority), priority)
 
 
 def nullHeuristic(state, problem=None):
@@ -233,7 +233,33 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # priority = (cost + parent cost) + heuristic
+    # using actions inside queue instead of parents_graph to backtrack goal. Each node stores the actions to take to him, so when the goal is reached, you return this value):
+
+
+
+    start = problem.getStartState()
+    frontier = util.PriorityQueue()
+    frontier.push([start, [], 0], 0)
+    explored = []
+
+    while not frontier.isEmpty():
+        # node[0] = State/Name
+        # node[1] = Actions from Start to Node
+        # node[2] = Cost
+        node = frontier.pop()
+        if node[0] not in explored:
+            explored.append(node[0])
+            if problem.isGoalState(node[0]):
+                return node[1]
+            
+            for neighbor in problem.getSuccessors(node[0]):
+                priority = (node[2] + neighbor[2]) + \
+                    heuristic(neighbor[0], problem)
+                actions_to_neighbor = node[1] + [neighbor[1]]
+                frontier.push(
+                    (neighbor[0], actions_to_neighbor, priority), priority)
+
 
 
 # Abbreviations
