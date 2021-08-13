@@ -145,55 +145,25 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
+#     # BASED ON https://www.youtube.com/watch?v=MMCUepjSoLQ&list=LL&index=2&t=2s adapted to:
+
 
     inicio = problem.getStartState()
-    vertices_descobertos = {}
-    # graph storing directions to go to start
-    parents_graph = {}
-    acoes = []
-    goal = False
+    vertices_descobertos = []
     fila = util.Queue()
-    fila.push((inicio, 'inicio'))
-#     # BASED ON https://www.youtube.com/watch?v=MMCUepjSoLQ&list=LL&index=2&t=2s adapted to:
-#        escolha uma raiz s de G
-#    marque s
-#    insira s em F
-#    enquanto F nao esta vazia faca
-#       seja v o primeiro vertice de F
-#       para cada w pertence a listaDeAdjacencia de v faca
-#          se w nao esta marcado entao
-#             visite aresta entre v e w
-#             marque w
-#             insira w em F
-#          senao se w pertence a F entao
-#             visite aresta entre v e w
-#          fim se
-#       fim para
-#       retira v de F
-#    fim enquanto
+    fila.push([inicio, []])
+
     while not fila.isEmpty():
-        v = fila.pop()
-        vertices_descobertos[v[0]] = v[1]
-
-        if problem.isGoalState(v[0]):
-            final_state = v[0]
-            break
-
-        for vertice_adjacente in problem.getSuccessors(v[0]):
-            if vertice_adjacente[0] not in vertices_descobertos.keys() and vertice_adjacente[0] not in parents_graph.keys():
-                parents_graph[vertice_adjacente[0]] = v[0]
-                fila.push(vertice_adjacente)
-
-    # montando a lista de acoes:
-    try:
-        while(final_state in parents_graph.keys()):
-            final_state_prev = parents_graph[final_state]
-            acoes.insert(0, vertices_descobertos[final_state])
-            final_state = final_state_prev
-    except NameError:
-        print "Caminho nao encontrado."
-    return acoes
+        node = fila.pop()
+        # node[0]: state/name
+        # node[1]: actions to take to node[0]
+        if node[0] not in vertices_descobertos:
+            vertices_descobertos.append(node[0])
+            if problem.isGoalState(node[0]):
+                return node[1]
+            for vertice_adjacente in problem.getSuccessors(node[0]):
+                actions_to_vertice_adjacente = node[1] + [vertice_adjacente[1]]
+                fila.push([vertice_adjacente[0], actions_to_vertice_adjacente])
 
 
 def uniformCostSearch(problem):
@@ -210,7 +180,7 @@ def uniformCostSearch(problem):
 
     while not frontier.isEmpty():
         # node[0] = State/Name
-        # node[1] = Action
+        # node[1] = Actions to go to node[0] from start
         # node[2] = Cost
         node = frontier.pop()
         if node[0] not in explored:
@@ -238,8 +208,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     # priority = (cost + parent cost) + heuristic
     # using actions inside queue instead of parents_graph to backtrack goal. Each node stores the actions to take to him, so when the goal is reached, you return this value):
 
-
-
     start = problem.getStartState()
     frontier = util.PriorityQueue()
     frontier.push([start, [], 0], 0)
@@ -254,14 +222,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             explored.append(node[0])
             if problem.isGoalState(node[0]):
                 return node[1]
-            
+
             for neighbor in problem.getSuccessors(node[0]):
                 priority = (node[2] + neighbor[2]) + \
                     heuristic(neighbor[0], problem)
                 actions_to_neighbor = node[1] + [neighbor[1]]
                 frontier.push(
                     (neighbor[0], actions_to_neighbor, priority), priority)
-
 
 
 # Abbreviations
