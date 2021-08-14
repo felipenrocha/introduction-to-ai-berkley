@@ -402,7 +402,7 @@ def cornersHeuristic(state, problem):
     x2, y2 = state[0][0], state[0][1]
     for corner in corners:
         if corner not in state[1]:
-        # from: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+            # from: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
             x1, y1 = corner[0], corner[1]
             # dx1 = x2 - x1
             # dy1 = y2 - y1
@@ -415,7 +415,6 @@ def cornersHeuristic(state, problem):
         if len(distances) != 0:
             return min(distances)
     return 0
-
 
 
 class AStarCornersAgent(SearchAgent):
@@ -517,10 +516,20 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    print('question-=7')
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    foods = foodGrid.asList()  # These are the corner coordinates
+    # These are the walls of the maze, as a Grid (game.py)
+    walls = problem.walls
+    distances = []
     return 0
+    "*** YOUR CODE HERE ***"
+    x2, y2 = state[0][0], state[0][1]
+    for food in foods:
+        x1, y1 = food[0], food[1]
+        distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** .5
+        distances.append(distance)
+    return min(distances)
 
 
 class ClosestDotSearchAgent(SearchAgent):
