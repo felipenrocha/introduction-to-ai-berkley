@@ -288,6 +288,7 @@ def euclideanHeuristic(position, problem, info={}):
 
 
 class CornersProblem(search.SearchProblem):
+    # huge help from: https://inst.eecs.berkeley.edu/~cs188/fa19/assets/notes/note01.pdf
     """
     This search problem finds paths through all four corners of a layout.
 
@@ -307,7 +308,6 @@ class CornersProblem(search.SearchProblem):
                 print 'Warning: no food in corner ' + str(corner)
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
 
-
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
@@ -317,7 +317,7 @@ class CornersProblem(search.SearchProblem):
         # Hint: The only parts of the game state you need to reference in your implementation are the starting Pacman position and the location of the four corners.
 
         # state[0]: starting position, state[1] = corners reached
-        return (self.startingPosition,[])
+        return (self.startingPosition, [])
 
     def isGoalState(self, state):
         """
@@ -326,7 +326,7 @@ class CornersProblem(search.SearchProblem):
         isGoal = False
         goals_reached = list(state[1])
         if state[0] not in goals_reached and state[0] in self.corners:
-            # push state if its not in goals reached yet  
+            # push state if its not in goals reached yet
             goals_reached.append(state[0])
         goals_reached.sort()
         self.corners.sort()
@@ -345,7 +345,6 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-        print('sucessor state', state)
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x, y = state[0]
@@ -358,7 +357,7 @@ class CornersProblem(search.SearchProblem):
                 if nextState in self.corners:
                     if nextState not in cornes_reached:
                         cornes_reached.append(nextState)
-                successors.append(((nextState, cornes_reached), action))
+                successors.append(((nextState, cornes_reached), action, 1))
 
         self._expanded += 1
         return successors
@@ -395,9 +394,28 @@ def cornersHeuristic(state, problem):
     corners = problem.corners  # These are the corner coordinates
     # These are the walls of the maze, as a Grid (game.py)
     walls = problem.walls
-
+    distances = []
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    start = problem.getStartState()[0]
+    startx = start[0]
+    starty = start[1]
+    x2, y2 = state[0][0], state[0][1]
+    for corner in corners:
+        if corner not in state[1]:
+        # from: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+            x1, y1 = corner[0], corner[1]
+            # dx1 = x2 - x1
+            # dy1 = y2 - y1
+            # dx2 = startx- x1
+            # dy2 = starty - x2
+            # cross = abs(dx1*dy2 - dx2*dy1)
+            # distance = cross * 0.5
+            distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** .5
+            distances.append(distance)
+        if len(distances) != 0:
+            return min(distances)
+    return 0
+
 
 
 class AStarCornersAgent(SearchAgent):
@@ -499,6 +517,7 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    print('question-=7')
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     return 0
