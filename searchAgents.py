@@ -516,20 +516,24 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    start = problem.getStartState()[0]
+    startx = start[0]
+    starty = start[1]
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
     foods = foodGrid.asList()  # These are the corner coordinates
     # These are the walls of the maze, as a Grid (game.py)
     walls = problem.walls
     distances = []
-    return 0
-    "*** YOUR CODE HERE ***"
+    distance = 0.1
     x2, y2 = state[0][0], state[0][1]
     for food in foods:
         x1, y1 = food[0], food[1]
+
         distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** .5
         distances.append(distance)
-    return min(distances)
+        if len(distances) != 0:
+            return min(distances)
+    return 0
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -560,10 +564,28 @@ class ClosestDotSearchAgent(SearchAgent):
         startPosition = gameState.getPacmanPosition()
         food = gameState.getFood()
         walls = gameState.getWalls()
-        problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        x1, y1 = startPosition[0], startPosition[1]
+        # get distance of foods and store in dict:
+        foodsDistance = {}
+        for food in food.asList():
+            x2, y2 = food[0], food[1]
+            distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** .5
+            foodsDistance[food] = distance
+        # min distance stores key from lowest distance from food positions, initialized with first element in dict foodsDistance
+        min_distance = foodsDistance.keys()[0]
+        # get lowest distancec from current state:
+        for key in foodsDistance:
+            if foodsDistance[key] < foodsDistance[min_distance]:
+                min_distance = key
+        # create prob state from distance setting goal to closest dot
+
+        prob = PositionSearchProblem(
+        gameState, start=startPosition, goal=min_distance, warn=False, visualize=False)
+        # use ucs to return actions
+        actions = search.uniformCostSearch(prob)
+        return actions
+        # returning closest food:
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -598,9 +620,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x, y = state
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if state in self.food.asList():
+            return True
+        return False
 
 
 def mazeDistance(point1, point2, gameState):
